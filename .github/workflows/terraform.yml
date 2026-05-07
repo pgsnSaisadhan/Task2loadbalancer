@@ -1,0 +1,62 @@
+name: "Azure Terraform CI/CD"
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    name: "Terraform Deploy"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # ============================================================
+    # Checkout Code
+    # ============================================================
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # ============================================================
+    # Setup Terraform
+    # ============================================================
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+    # ============================================================
+    # Azure Login (Service Principal)
+    # ============================================================
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    # ============================================================
+    # Terraform Init
+    # ============================================================
+    - name: Terraform Init
+      run: terraform init
+
+    # ============================================================
+    # Terraform Validate
+    # ============================================================
+    - name: Terraform Validate
+      run: terraform validate
+
+    # ============================================================
+    # Terraform Plan
+    # ============================================================
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+
+    # ============================================================
+    # Terraform Apply
+    # ============================================================
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
