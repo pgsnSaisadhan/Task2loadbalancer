@@ -1,4 +1,4 @@
-name: "Azure Terraform CI/CD"
+name: "Azure Terraform CI/CD Pipeline"
 
 on:
   push:
@@ -9,54 +9,38 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform Deploy"
+    name: "Terraform Deployment"
     runs-on: ubuntu-latest
 
     defaults:
       run:
         shell: bash
+        working-directory: .
 
     steps:
-    # ============================================================
-    # Checkout Code
-    # ============================================================
+
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    # ============================================================
-    # Setup Terraform
-    # ============================================================
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
-    # ============================================================
-    # Azure Login (Service Principal)
-    # ============================================================
     - name: Azure Login
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # ============================================================
-    # Terraform Init
-    # ============================================================
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -upgrade
 
-    # ============================================================
-    # Terraform Validate
-    # ============================================================
+    - name: Terraform Format Check
+      run: terraform fmt -check
+
     - name: Terraform Validate
       run: terraform validate
 
-    # ============================================================
-    # Terraform Plan
-    # ============================================================
     - name: Terraform Plan
       run: terraform plan -out=tfplan
 
-    # ============================================================
-    # Terraform Apply
-    # ============================================================
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
