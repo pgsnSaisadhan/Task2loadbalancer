@@ -9,38 +9,65 @@ on:
 
 jobs:
   terraform:
-    name: "Terraform Deployment"
+    name: "Terraform Infrastructure Deployment"
     runs-on: ubuntu-latest
 
     defaults:
       run:
         shell: bash
-        working-directory: .
 
     steps:
 
+    # ============================================================
+    # 1. Checkout Code
+    # ============================================================
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    # ============================================================
+    # 2. Setup Terraform
+    # ============================================================
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: latest
 
+    # ============================================================
+    # 3. Azure Login (Service Principal)
+    # IMPORTANT: AZURE_CREDENTIALS must contain ONLY:
+    # clientId, clientSecret, subscriptionId, tenantId
+    # ============================================================
     - name: Azure Login
       uses: azure/login@v2
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    # ============================================================
+    # 4. Terraform Init
+    # ============================================================
     - name: Terraform Init
       run: terraform init -upgrade
 
+    # ============================================================
+    # 5. Terraform Format Check
+    # ============================================================
     - name: Terraform Format Check
       run: terraform fmt -check
 
+    # ============================================================
+    # 6. Terraform Validate
+    # ============================================================
     - name: Terraform Validate
       run: terraform validate
 
+    # ============================================================
+    # 7. Terraform Plan
+    # ============================================================
     - name: Terraform Plan
       run: terraform plan -out=tfplan
 
+    # ============================================================
+    # 8. Terraform Apply
+    # ============================================================
     - name: Terraform Apply
       run: terraform apply -auto-approve tfplan
