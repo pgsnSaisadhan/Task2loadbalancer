@@ -145,9 +145,9 @@ resource "azurerm_windows_virtual_machine" "vm" {
 # ============================================================
 
 resource "azurerm_virtual_machine_extension" "iis" {
-  count                = 2
-  name                 = "iis-install-${count.index}"
-  virtual_machine_id   = azurerm_windows_virtual_machine.vm[count.index].id
+  count              = 2
+  name               = "iis-install-${count.index}"
+  virtual_machine_id = azurerm_windows_virtual_machine.vm[count.index].id
 
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
@@ -223,9 +223,9 @@ resource "azurerm_lb_probe" "probe" {
 # ============================================================
 
 resource "azurerm_lb_rule" "rule" {
-  loadbalancer_id                = azurerm_lb.lb.id
-  name                           = "http-rule"
-  protocol                       = "Tcp"
+  loadbalancer_id = azurerm_lb.lb.id
+  name            = "http-rule"
+  protocol        = "Tcp"
 
   frontend_port = 80
   backend_port  = 80
