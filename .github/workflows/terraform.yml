@@ -1,10 +1,9 @@
-name: Terraform Deployment
-# Updated GitHub Actions Workflow
+name: Terraform Deploy Azure Windows VM
+
 on:
   push:
     branches:
       - main
-      - feature
 
 jobs:
   terraform:
@@ -18,46 +17,28 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.TENANT_ID }}
 
     steps:
-      # Checkout Repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Azure Login
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: |
-            {
-              "clientId": "${{ secrets.CLIENT_ID }}",
-              "clientSecret": "${{ secrets.CLIENT_SECRET }}",
-              "subscriptionId": "${{ secrets.SUBSCRIPTION_ID }}",
-              "tenantId": "${{ secrets.TENANT_ID }}"
-            }
-
-      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
 
-      # Terraform Init
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
-      # Terraform Format Check
-      - name: Terraform Format
-        run: terraform fmt -check
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
 
-      # Terraform Validate
       - name: Terraform Validate
         run: terraform validate
 
-      # Terraform Plan
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false
 
-      # Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
 
-      # Terraform Output
       - name: Terraform Output
         run: terraform output
