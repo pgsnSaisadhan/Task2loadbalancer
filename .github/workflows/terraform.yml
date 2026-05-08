@@ -1,4 +1,4 @@
-name: Terraform Deploy Azure Windows VM
+name: Terraform Deploy Windows VM
 
 on:
   push:
